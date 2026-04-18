@@ -1,0 +1,22 @@
+# Maven build output
+/smart_campus/target/
+target/
+
+# NetBeans project files
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+*.iml
+*.iws
+*.ipr
+
+# IDE general
+.idea/
+*.class
+
+# OS files
+.DS_Store
+Thumbs.db
