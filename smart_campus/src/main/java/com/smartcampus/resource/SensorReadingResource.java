@@ -1,5 +1,6 @@
 package com.smartcampus.resource;
 
+import com.smartcampus.exception.SensorUnavailableException;
 import com.smartcampus.model.Sensor;
 import com.smartcampus.model.SensorReading;
 import com.smartcampus.store.DataStore;
@@ -65,12 +66,13 @@ public class SensorReadingResource {
                     .build();
         }
 
-        // State Constraint: Block readings for MAINTENANCE sensors
+        // State Constraint - Part 5.3
+        // Throws SensorUnavailableException -> mapped to HTTP 403 Forbidden by ExceptionMapper
         if ("MAINTENANCE".equalsIgnoreCase(sensor.getStatus())) {
-            return Response.status(Response.Status.FORBIDDEN)
-                    .entity("{\"error\": \"Sensor '" + sensorId +
-                            "' is currently in MAINTENANCE and cannot accept new readings.\"}")
-                    .build();
+            throw new SensorUnavailableException(
+                "Sensor '" + sensorId + "' is currently in MAINTENANCE status " +
+                "and cannot accept new readings."
+            );
         }
 
         // Auto-generate ID and timestamp if not provided
