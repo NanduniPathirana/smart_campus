@@ -1,5 +1,6 @@
 package com.smartcampus.exception;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -25,16 +26,21 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
     @Override
     public Response toResponse(Throwable exception) {
-        
-        exception.printStackTrace();
-        // Log the full exception server-side for developer debugging
+
+        // Pass through WebApplicationExceptions (404, 415 etc.) unchanged.
+        // These are deliberate HTTP responses, not unexpected errors.
+        if (exception instanceof WebApplicationException) {
+            return ((WebApplicationException) exception).getResponse();
+        }
+
+        // Log the full exception server-side for developer debugging only
         LOGGER.log(Level.SEVERE, "Unexpected internal server error: " + exception.getMessage(), exception);
 
-        // Return a safe, generic response to the client - NO stack trace exposed
+        // Return a safe, generic response - NO stack trace exposed to client
         Map<String, Object> error = new LinkedHashMap<>();
         error.put("status", 500);
         error.put("error", "Internal Server Error");
-        error.put("message", exception.getMessage());
+        error.put("message", "An unexpected error occurred. Please contact the system administrator.");
 
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .type(MediaType.APPLICATION_JSON)

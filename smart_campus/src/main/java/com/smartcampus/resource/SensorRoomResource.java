@@ -7,6 +7,7 @@ import com.smartcampus.store.DataStore;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +60,8 @@ public class SensorRoomResource {
                     .build();
         }
         store.addRoom(room);
-        return Response.status(Response.Status.CREATED).entity(room).build();
+        URI location = URI.create("http://localhost:8080/api/v1/rooms/" + room.getId());
+        return Response.created(location).entity(room).build();
     }
 
     // ─── GET /api/v1/rooms/{roomId} ──────────────────────────────────────────────
