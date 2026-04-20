@@ -1,0 +1,102 @@
+package com.smartcampus.resource;
+
+import com.smartcampus.model.Sensor;
+import com.smartcampus.store.DataStore;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Sensor Resource - Part 3.1
+ *
+ * Manages the /api/v1/sensors collection.
+ *
+ * Endpoints:
+ *   POST /api/v1/sensors            - Register a new sensor (validates roomId exists)
+ *   GET  /api/v1/sensors            - List all sensors
+ *   GET  /api/v1/sensors/{sensorId} - Get a specific sensor by ID
+ */
+@Path("sensors")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class SensorResource {
+
+    private final DataStore store = DataStore.getInstance();
+
+    // POST /api/v1/sensors 
+    /**
+     * Part 3.1 - Registers a new sensor.
+     *
+     * Integrity Check: Validates that the roomId in the request body
+     * actually exists in the system before registering the sensor.
+     * If the roomId does not exist, throws LinkedResourceNotFoundException -> HTTP 422.
+     
+     * HTTP 415 Unsupported Media Type without reaching this method.
+     */
+    @POST
+    public Response registerSensor(Sensor sensor) {
+        // Validate required fields
+        if (sensor.getId() == null || sensor.getId().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Sensor ID is required\"}")
+                    .build();
+        }
+
+        // Validate that the referenced roomId actually exists - Part 3.1
+        // Returns 422 Unprocessable Entity if the roomId does not exist.
+        
+        if (sensor.getRoomId() == null || !store.roomExists(sensor.getRoomId())) {
+            return Response.status(422)
+                    .entity("{\"error\": \"roomId '" + sensor.getRoomId() + "' does not exist in the system.\"}")
+                    .build();
+        }
+
+        // Check for duplicate sensor ID
+        if (store.sensorExists(sensor.getId())) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("{\"error\": \"Sensor with ID '" + sensor.getId() + "' already exists\"}")
+                    .build();
+        }
+
+        // Set default status if not provided
+        if (sensor.getStatus() == null || sensor.getStatus().isEmpty()) {
+            sensor.setStatus("ACTIVE");
+        }
+
+        // Register sensor and link it to the room's sensorIds list
+        store.addSensor(sensor);
+        store.getRoom(sensor.getRoomId()).getSensorIds().add(sensor.getId());
+
+        return Response.status(Response.Status.CREATED).entity(sensor).build();
+    }
+
+    // GET /api/v1/sensors 
+    /**
+     * Part 3.1 - Returns a full list of all registered sensors.
+     */
+    @GET
+    public Response getAllSensors() {
+        List<Sensor> sensorList = new ArrayList<>(store.getSensors().values());
+        return Response.ok(sensorList).build();
+    }
+
+    // GET /api/v1/sensors/{sensorId} 
+    /**
+     * Returns a specific sensor by ID.
+     * Returns HTTP 404 if the sensor does not exist.
+     */
+    @GET
+    @Path("{sensorId}")
+    public Response getSensorById(@PathParam("sensorId") String sensorId) {
+        Sensor sensor = store.getSensor(sensorId);
+        if (sensor == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\": \"Sensor not found with ID: " + sensorId + "\"}")
+                    .build();
+        }
+        return Response.ok(sensor).build();
+    }
+}
