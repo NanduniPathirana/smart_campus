@@ -10,14 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Sensor Resource - Part 3.1
+ * Sensor Resource - Part 3.1 & 3.2
  *
  * Manages the /api/v1/sensors collection.
  *
  * Endpoints:
- *   POST /api/v1/sensors            - Register a new sensor (validates roomId exists)
- *   GET  /api/v1/sensors            - List all sensors
- *   GET  /api/v1/sensors/{sensorId} - Get a specific sensor by ID
+ *   POST /api/v1/sensors              - Register a new sensor (validates roomId exists)
+ *   GET  /api/v1/sensors              - List all sensors
+ *   GET  /api/v1/sensors?type=CO2     - Filter sensors by type (Part 3.2)
+ *   GET  /api/v1/sensors/{sensorId}   - Get a specific sensor by ID
  */
 @Path("sensors")
 @Produces(MediaType.APPLICATION_JSON)
@@ -73,13 +74,29 @@ public class SensorResource {
         return Response.status(Response.Status.CREATED).entity(sensor).build();
     }
 
-    // GET /api/v1/sensors 
+    // GET /api/v1/sensors
     /**
-     * Part 3.1 - Returns a full list of all registered sensors.
+     * Part 3.2 - Returns all sensors with optional @QueryParam type filtering.
+     *
+     * Usage:
+     *   GET /api/v1/sensors           -> returns ALL sensors
+     *   GET /api/v1/sensors?type=CO2  -> returns only CO2 type sensors
      */
     @GET
-    public Response getAllSensors() {
+    public Response getAllSensors(@QueryParam("type") String type) {
         List<Sensor> sensorList = new ArrayList<>(store.getSensors().values());
+
+        // Apply optional type filter - Part 3.2
+        if (type != null && !type.isEmpty()) {
+            List<Sensor> filtered = new ArrayList<>();
+            for (Sensor sensor : sensorList) {
+                if (sensor.getType().equalsIgnoreCase(type)) {
+                    filtered.add(sensor);
+                }
+            }
+            return Response.ok(filtered).build();
+        }
+
         return Response.ok(sensorList).build();
     }
 
