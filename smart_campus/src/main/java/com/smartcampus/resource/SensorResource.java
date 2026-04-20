@@ -116,4 +116,12 @@ public class SensorResource {
         }
         return Response.ok(sensor).build();
     }
+
+    // Sub-Resource Locator - Part 4.1 
+    // Part 4.1 - Sub-Resource Locator for {sensorId}/readings.
+    
+    @Path("{sensorId}/readings")
+    public SensorReadingResource getReadingsResource(@PathParam("sensorId") String sensorId) {
+        return new SensorReadingResource(sensorId);
+    }
 }
