@@ -55,10 +55,10 @@ public class DataStore {
         rooms.put(room3.getId(), room3);
 
         // Sample Sensors
-        Sensor sensor1 = new Sensor("TEMP-001", "Temperature", "ACTIVE", 22.5, "LIB-301");
-        Sensor sensor2 = new Sensor("CO2-001", "CO2", "ACTIVE", 412.0, "LIB-301");
-        Sensor sensor3 = new Sensor("OCC-001", "Occupancy", "MAINTENANCE", 0.0, "LAB-101");
-        Sensor sensor4 = new Sensor("TEMP-002", "Temperature", "ACTIVE", 19.8, "HALL-A");
+        Sensor sensor1 = new Sensor("TEMP-001", "Temperature", "ACTIVE", 22.5, "1LE - GP");
+        Sensor sensor2 = new Sensor("CO2-001", "CO2", "ACTIVE", 412.0, "1LE - GP");
+        Sensor sensor3 = new Sensor("OCC-001", "Occupancy", "MAINTENANCE", 0.0, "5LA");
+        Sensor sensor4 = new Sensor("TEMP-002", "Temperature", "ACTIVE", 19.8, "1st Floor - SP");
 
         sensors.put(sensor1.getId(), sensor1);
         sensors.put(sensor2.getId(), sensor2);

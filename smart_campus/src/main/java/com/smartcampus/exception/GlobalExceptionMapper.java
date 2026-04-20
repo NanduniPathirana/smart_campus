@@ -25,6 +25,8 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
     @Override
     public Response toResponse(Throwable exception) {
+        
+        exception.printStackTrace();
         // Log the full exception server-side for developer debugging
         LOGGER.log(Level.SEVERE, "Unexpected internal server error: " + exception.getMessage(), exception);
 
@@ -32,7 +34,7 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
         Map<String, Object> error = new LinkedHashMap<>();
         error.put("status", 500);
         error.put("error", "Internal Server Error");
-        error.put("message", "An unexpected error occurred. Please contact the system administrator.");
+        error.put("message", exception.getMessage());
 
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .type(MediaType.APPLICATION_JSON)

@@ -27,20 +27,18 @@ public class DiscoveryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response discover() {
 
-        // Build the resource links map (HATEOAS)
+        Map<String, Object> info = new LinkedHashMap<>();
+        info.put("apiName", "Smart Campus Sensor & Room Management API");
+        info.put("version", "1.0");
+        info.put("description", "A RESTful API for managing campus rooms and IoT sensors");
+        info.put("contact", "admin@smartcampus.ac.uk");
+        info.put("basePath", "/api/v1");
+
         Map<String, String> resources = new LinkedHashMap<>();
         resources.put("rooms", "/api/v1/rooms");
         resources.put("sensors", "/api/v1/sensors");
+        info.put("resources", resources);
 
-        // Build the full API metadata response
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("apiName", "Smart Campus Sensor & Room Management API");
-        response.put("version", "1.0");
-        response.put("description", "A RESTful API for managing campus rooms and IoT sensors");
-        response.put("contact", "admin@smartcampus.ac.uk");
-        response.put("basePath", "/api/v1");
-        response.put("resources", resources);
-
-        return Response.ok(response).build();
+        return Response.ok(info).build();
     }
 }
