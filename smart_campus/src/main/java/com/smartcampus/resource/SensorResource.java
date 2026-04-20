@@ -1,5 +1,6 @@
 package com.smartcampus.resource;
 
+import com.smartcampus.exception.LinkedResourceNotFoundException;
 import com.smartcampus.model.Sensor;
 import com.smartcampus.store.DataStore;
 
@@ -46,13 +47,14 @@ public class SensorResource {
                     .build();
         }
 
-        // Validate that the referenced roomId actually exists - Part 3.1
-        // Returns 422 Unprocessable Entity if the roomId does not exist.
-        
+        // Validate that the referenced roomId actually exists - Part 5.2
+        // Throws LinkedResourceNotFoundException -> mapped to HTTP 422 by ExceptionMapper
         if (sensor.getRoomId() == null || !store.roomExists(sensor.getRoomId())) {
-            return Response.status(422)
-                    .entity("{\"error\": \"roomId '" + sensor.getRoomId() + "' does not exist in the system.\"}")
-                    .build();
+            throw new LinkedResourceNotFoundException(
+                "Cannot register sensor '" + sensor.getId() +
+                "'. The referenced roomId '" + sensor.getRoomId() +
+                "' does not exist in the system."
+            );
         }
 
         // Check for duplicate sensor ID
