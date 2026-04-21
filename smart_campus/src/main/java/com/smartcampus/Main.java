@@ -13,7 +13,7 @@ import java.net.URI;
 public class Main {
 
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://localhost:8080/api/v1/";
+    public static final String BASE_URI = "http://localhost:8080/api/v1";
 
     // Starts the Grizzly HTTP server exposing the JAX-RS resources.
 
@@ -21,7 +21,11 @@ public class Main {
         // Create a ResourceConfig that scans for JAX-RS resources in com.smartcampus package
         // JacksonFeature must be explicitly registered to enable JSON serialization
         final ResourceConfig rc = new ResourceConfig()
-                .packages("com.smartcampus")
+                .packages(
+                        "com.smartcampus.resource",
+                        "com.smartcampus.exception",
+                        "com.smartcampus.filter"
+                )
                 .register(JacksonFeature.class);
 
         // Create and start the Grizzly HTTP server
